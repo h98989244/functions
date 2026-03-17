@@ -22,9 +22,16 @@ export function useUpdateSiteSettings() {
 
   return useMutation({
     mutationFn: async (settings: Partial<SiteSettings>) => {
+      const { data: existing } = await supabase
+        .from('site_settings')
+        .select('id')
+        .limit(1)
+        .single();
+
       const { data, error } = await supabase
         .from('site_settings')
         .update(settings)
+        .eq('id', existing!.id)
         .select()
         .single();
 
