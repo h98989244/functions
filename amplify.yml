@@ -16,10 +16,6 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
-  customRules:
-    - source: '</^[^.]+$|\.(?!(css|gif|ico|jpg|jpeg|js|png|txt|svg|woff|woff2|ttf|map|json|webp)$)([^.]+$)/>'
-      target: /index.html
-      status: '200'
   customHeaders:
     - pattern: '**/*'
       headers:
