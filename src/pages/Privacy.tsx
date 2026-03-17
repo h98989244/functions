@@ -88,7 +88,7 @@ export default function Privacy() {
           <Shield className="h-8 w-8 text-primary" />
         </div>
         <h1 className="text-3xl font-bold text-text-primary md:text-4xl">隱私權政策</h1>
-        <p className="mt-2 text-sm text-text-muted">最後更新日期：2025 年 1 月</p>
+        <p className="mt-2 text-sm text-text-muted">最後更新日期：2026 年 3 月 1 日</p>
       </div>
 
       <div className="card mb-8 p-6">
