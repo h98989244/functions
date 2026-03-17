@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, Settings, ShoppingBag, ShoppingCart, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
@@ -9,8 +9,9 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const { user } = useAuthStore();
-  const { openDrawer, getItemCount } = useCartStore();
+  const { getItemCount } = useCartStore();
   const location = useLocation();
+  const navigate = useNavigate();
   const itemCount = getItemCount();
 
   const handleSignOut = async () => {
@@ -55,7 +56,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-4 md:flex">
           {/* Cart button */}
           <button
-            onClick={openDrawer}
+            onClick={() => navigate('/cart')}
             className="relative rounded-lg p-2 text-text-secondary transition-colors hover:bg-bg-card hover:text-primary"
           >
             <ShoppingCart className="h-5 w-5" />
@@ -117,7 +118,7 @@ export default function Navbar() {
         {/* Mobile right */}
         <div className="flex items-center gap-2 md:hidden">
           <button
-            onClick={openDrawer}
+            onClick={() => navigate('/cart')}
             className="relative rounded-lg p-2 text-text-secondary"
           >
             <ShoppingCart className="h-5 w-5" />

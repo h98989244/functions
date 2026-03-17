@@ -14,6 +14,7 @@ import Terms from '@/pages/Terms';
 import AdminLogin from '@/pages/admin/Login';
 import AdminProductList from '@/pages/admin/ProductList';
 import AdminProductForm from '@/pages/admin/ProductForm';
+import Cart from '@/pages/Cart';
 import Checkout from '@/pages/Checkout';
 import CartDrawer from '@/components/CartDrawer';
 import AdminContactSettings from '@/pages/admin/ContactSettings';
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:slug" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />

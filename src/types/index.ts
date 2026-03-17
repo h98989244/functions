@@ -31,3 +31,29 @@ export interface CartItem {
   product: Product;
   quantity: number;
 }
+
+export interface Order {
+  id: string;
+  order_number: string;
+  email: string;
+  phone: string | null;
+  payment_method: string;
+  status: string;
+  subtotal: number;
+  fee: number;
+  total: number;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string | null;
+  product_name: string;
+  denomination: number;
+  quantity: number;
+  subtotal: number;
+  created_at: string;
+}
