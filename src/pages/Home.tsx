@@ -9,22 +9,16 @@ export default function Home() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-bg-dark via-bg-surface to-bg-dark py-24">
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(0, 229, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(124, 77, 255, 0.1) 0%, transparent 50%)',
-        }} />
-        <div className="relative mx-auto max-w-7xl px-4 text-center">
-          <h1 className="text-5xl font-black tracking-tight text-text-primary md:text-7xl">
-            POWER UP <span className="text-primary">YOUR GAME!</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-text-secondary">
-            安全、快速的遊戲點數卡購買平台。即時發送，全天候服務。
-          </p>
-          <Link to="/products" className="btn-primary mt-8 inline-flex items-center gap-2 px-8 py-3 text-lg">
-            立即選購 <ChevronRight className="h-5 w-5" />
-          </Link>
-        </div>
+      {/* Hero Banner */}
+      <section className="relative w-full overflow-hidden">
+        <Link to="/products" className="block">
+          <img
+            src="/ad.jpg"
+            alt="提升您的遊戲體驗 - 即時存取、安全支付、立即充值"
+            className="w-full object-cover"
+            style={{ maxHeight: '560px' }}
+          />
+        </Link>
       </section>
 
       {/* Featured Products */}
