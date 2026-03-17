@@ -1,166 +1,179 @@
 import { useState, useMemo } from 'react';
-import { Search, ShoppingCart, ChevronDown, ChevronUp, ExternalLink, Info, AlertTriangle } from 'lucide-react';
+import { Search, ShoppingCart, Info, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import type { Product } from '@/types';
 
-function ProductFullCard({ product }: { product: Product }) {
-  const [selectedDenom, setSelectedDenom] = useState<number | null>(null);
-  const [showInstructions, setShowInstructions] = useState(false);
-  const [showNotice, setShowNotice] = useState(false);
-  const [currentImage, setCurrentImage] = useState(0);
-
-  const imageUrl = product.images?.[currentImage] || product.images?.[0];
+function DenominationCard({ product, denomination }: { product: Product; denomination: number }) {
+  const imageUrl = product.images?.[0];
+  const buyUrl = product.buy_url || '#';
 
   return (
-    <div className="card overflow-hidden">
-      <div className="flex flex-col lg:flex-row">
-        {/* Left: Image */}
-        <div className="relative w-full lg:w-[400px] shrink-0">
-          <div className="aspect-square overflow-hidden bg-bg-surface">
-            {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt={product.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <ShoppingCart className="h-16 w-16 text-text-muted" />
-              </div>
-            )}
-          </div>
-          {/* Thumbnail row */}
-          {product.images && product.images.length > 1 && (
-            <div className="flex gap-2 p-3 overflow-x-auto">
-              {product.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentImage(idx)}
-                  className={`h-14 w-14 shrink-0 overflow-hidden rounded border-2 transition-all ${
-                    currentImage === idx ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'
-                  }`}
-                >
-                  <img src={img} alt={`${product.name} ${idx + 1}`} className="h-full w-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
-          {product.is_featured && (
-            <span className="absolute left-3 top-3 rounded bg-secondary px-3 py-1 text-xs font-bold text-white shadow-lg">
-              精選商品
+    <div className="card group flex flex-col items-center overflow-hidden p-4 text-center transition-all hover:border-primary/50 hover:shadow-[0_0_20px_rgba(0,229,255,0.1)]">
+      {/* Card image */}
+      <div className="relative mb-3 h-28 w-36 overflow-hidden rounded-lg bg-gradient-to-br from-amber-900/40 to-amber-800/20 p-2">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={`${product.name}【${denomination.toLocaleString()}點】`}
+            className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center">
+            <ShoppingCart className="mb-1 h-8 w-8 text-primary" />
+            <span className="text-lg font-bold text-primary">
+              {denomination.toLocaleString()}
             </span>
-          )}
-        </div>
-
-        {/* Right: Info */}
-        <div className="flex-1 p-6 lg:p-8">
-          {/* Header */}
-          <div className="flex items-start justify-between">
-            <div>
-              <span className="inline-block rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary">
-                {product.category || '點數卡'}
-              </span>
-              <h2 className="mt-2 text-2xl font-bold text-text-primary lg:text-3xl">
-                {product.name}
-              </h2>
-            </div>
           </div>
-
-          {/* Description */}
-          {product.short_desc && (
-            <p className="mt-3 text-text-secondary leading-relaxed">{product.short_desc}</p>
-          )}
-          {product.description && (
-            <p className="mt-2 text-sm text-text-muted leading-relaxed">{product.description}</p>
-          )}
-
-          {/* Denominations */}
-          {product.denominations && product.denominations.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold text-text-secondary mb-3">選擇面額</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.denominations.map((d) => (
-                  <button
-                    key={d}
-                    onClick={() => setSelectedDenom(selectedDenom === d ? null : d)}
-                    className={`rounded-lg border-2 px-4 py-2 text-sm font-semibold transition-all ${
-                      selectedDenom === d
-                        ? 'border-primary bg-primary/10 text-primary shadow-[0_0_12px_rgba(0,229,255,0.3)]'
-                        : 'border-border-default bg-bg-surface text-text-secondary hover:border-primary/50 hover:text-primary'
-                    }`}
-                  >
-                    NT$ {d.toLocaleString()}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Buy Button */}
-          <div className="mt-6">
-            {product.buy_url ? (
-              <a
-                href={product.buy_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary inline-flex items-center gap-2 px-8 py-3 text-base"
-              >
-                <ExternalLink className="h-4 w-4" />
-                {selectedDenom ? `購買 NT$ ${selectedDenom.toLocaleString()}` : '前往購買'}
-              </a>
-            ) : (
-              <span className="inline-flex items-center gap-2 rounded-lg bg-text-muted/20 px-8 py-3 text-base text-text-muted cursor-not-allowed">
-                購買連結準備中
-              </span>
-            )}
-          </div>
-
-          {/* Collapsible sections */}
-          <div className="mt-6 space-y-3">
-            {product.instructions && (
-              <div className="rounded-lg border border-border-default overflow-hidden">
-                <button
-                  onClick={() => setShowInstructions(!showInstructions)}
-                  className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-text-secondary hover:bg-bg-surface transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <Info className="h-4 w-4 text-primary" />
-                    使用說明
-                  </span>
-                  {showInstructions ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </button>
-                {showInstructions && (
-                  <div className="border-t border-border-default px-4 py-3 text-sm text-text-muted whitespace-pre-line leading-relaxed">
-                    {product.instructions}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {product.notice && (
-              <div className="rounded-lg border border-border-default overflow-hidden">
-                <button
-                  onClick={() => setShowNotice(!showNotice)}
-                  className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-text-secondary hover:bg-bg-surface transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                    注意事項
-                  </span>
-                  {showNotice ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </button>
-                {showNotice && (
-                  <div className="border-t border-border-default px-4 py-3 text-sm text-text-muted whitespace-pre-line leading-relaxed">
-                    {product.notice}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+        )}
+        {/* Denomination badge */}
+        <div className="absolute bottom-1 right-1 rounded bg-black/70 px-1.5 py-0.5 text-xs font-bold text-primary">
+          TWD {denomination.toLocaleString()}
         </div>
       </div>
+
+      {/* Name */}
+      <h3 className="text-sm font-semibold text-text-primary">
+        {product.name}【{denomination.toLocaleString()}點】
+      </h3>
+
+      {/* Price */}
+      <p className="mt-2 text-lg font-bold text-amber-400">
+        NT$ {denomination.toLocaleString()}
+      </p>
+
+      {/* Buy button */}
+      <a
+        href={buyUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn-primary mt-3 w-full py-2 text-center text-sm"
+      >
+        立即購買
+      </a>
     </div>
+  );
+}
+
+function ProductSection({ product }: { product: Product }) {
+  const [showNotice, setShowNotice] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const imageUrl = product.images?.[0];
+
+  // Sort denominations from high to low like mepay
+  const sortedDenominations = useMemo(() => {
+    return [...(product.denominations || [])].sort((a, b) => b - a);
+  }, [product.denominations]);
+
+  return (
+    <section className="mb-12">
+      {/* Product header */}
+      <div className="card mb-6 overflow-hidden">
+        <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start">
+          {/* Product image */}
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-bg-surface p-2">
+            {imageUrl ? (
+              <img src={imageUrl} alt={product.name} className="h-full w-full object-contain" />
+            ) : (
+              <ShoppingCart className="h-10 w-10 text-text-muted" />
+            )}
+          </div>
+
+          {/* Product info */}
+          <div className="flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">
+                自動發貨
+              </span>
+              {product.is_featured && (
+                <span className="rounded bg-secondary/20 px-2 py-0.5 text-xs font-semibold text-secondary">
+                  精選商品
+                </span>
+              )}
+            </div>
+            <h2 className="mt-2 text-2xl font-bold text-text-primary">{product.name} 點數卡</h2>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <span className="rounded-full border border-primary/30 bg-primary/5 px-3 py-0.5 text-xs text-primary">
+                {product.category || '點數卡'}
+              </span>
+              <span className="rounded-full border border-border-default bg-bg-surface px-3 py-0.5 text-xs text-text-muted">
+                點數卡
+              </span>
+            </div>
+            {product.short_desc && (
+              <p className="mt-3 text-sm text-text-muted">{product.short_desc}</p>
+            )}
+          </div>
+
+          {/* Purchase notice */}
+          <div className="w-full rounded-lg border border-border-default bg-bg-surface/50 p-4 sm:w-80">
+            <h3 className="mb-2 text-sm font-semibold text-text-primary">購買注意事項</h3>
+            <ul className="space-y-1 text-xs leading-relaxed text-text-muted">
+              <li>・本商品購買後將提供儲值序號（依品項內容包含卡號，MyCard 會加上密碼）。</li>
+              <li>・依《消費者保護法》規定，本商品屬「非有形媒介提供之數位內容」，一經發送即不適用七天鑑賞期。</li>
+              <li>・序號售出後恕不接受退貨、換貨或取消訂單。請務必確認品項與面額正確再行下單。</li>
+              <li>・取得序號後請儘速兌換並妥善保管，若因個人因素導致遺失或遭他人盜用，恕無法提供補發服務。</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Collapsible sections */}
+        <div className="border-t border-border-default">
+          {product.instructions && (
+            <div className="border-b border-border-default">
+              <button
+                onClick={() => setShowInstructions(!showInstructions)}
+                className="flex w-full items-center justify-between px-6 py-3 text-left text-sm font-medium text-text-secondary hover:bg-bg-surface/50 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Info className="h-4 w-4 text-primary" />
+                  使用說明
+                </span>
+                {showInstructions ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+              {showInstructions && (
+                <div className="px-6 pb-4 text-sm text-text-muted whitespace-pre-line leading-relaxed">
+                  {product.instructions}
+                </div>
+              )}
+            </div>
+          )}
+          {product.notice && (
+            <div>
+              <button
+                onClick={() => setShowNotice(!showNotice)}
+                className="flex w-full items-center justify-between px-6 py-3 text-left text-sm font-medium text-text-secondary hover:bg-bg-surface/50 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                  注意事項
+                </span>
+                {showNotice ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+              {showNotice && (
+                <div className="px-6 pb-4 text-sm text-text-muted whitespace-pre-line leading-relaxed">
+                  {product.notice}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Denomination title */}
+      <div className="mb-4 flex items-center gap-2">
+        <div className="h-6 w-1 rounded-full bg-primary" />
+        <h3 className="text-lg font-bold text-primary">遊戲幣</h3>
+        <span className="text-sm text-text-muted">（共 {sortedDenominations.length} 種面額）</span>
+      </div>
+
+      {/* Denomination grid */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {sortedDenominations.map((denom) => (
+          <DenominationCard key={denom} product={product} denomination={denom} />
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -191,7 +204,6 @@ export default function Products() {
 
       {/* Filters */}
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Category tabs */}
         <div className="flex flex-wrap gap-2">
           {categories.map((cat) => (
             <button
@@ -208,7 +220,6 @@ export default function Products() {
           ))}
         </div>
 
-        {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
           <input
@@ -221,20 +232,20 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Product list - one card per product */}
-      {isLoading ? (
-        <LoadingSpinner />
-      ) : filtered.length > 0 ? (
-        <div className="mt-8 space-y-8">
-          {filtered.map((product) => (
-            <ProductFullCard key={product.id} product={product} />
-          ))}
-        </div>
-      ) : (
-        <div className="mt-16 text-center text-text-muted">
-          <p className="text-lg">找不到符合條件的商品</p>
-        </div>
-      )}
+      {/* Products */}
+      <div className="mt-8">
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : filtered.length > 0 ? (
+          filtered.map((product) => (
+            <ProductSection key={product.id} product={product} />
+          ))
+        ) : (
+          <div className="mt-16 text-center text-text-muted">
+            <p className="text-lg">找不到符合條件的商品</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
