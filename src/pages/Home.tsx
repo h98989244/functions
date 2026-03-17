@@ -1,8 +1,50 @@
 import { Link } from 'react-router-dom';
-import { Search, CreditCard, Zap, ShieldAlert, ChevronRight } from 'lucide-react';
+import { Search, CreditCard, Zap, ShieldAlert, ChevronRight, ShoppingCart } from 'lucide-react';
 import { useFeaturedProducts } from '@/hooks/useProducts';
-import ProductCard from '@/components/ProductCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import type { Product } from '@/types';
+
+function FeaturedCard({ product }: { product: Product }) {
+  return (
+    <Link
+      to="/products"
+      className="card group overflow-hidden transition-all hover:border-primary/50 hover:shadow-[0_0_20px_rgba(0,229,255,0.1)]"
+    >
+      <div className="relative aspect-[4/3] overflow-hidden bg-bg-surface">
+        {product.image_url ? (
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <ShoppingCart className="h-12 w-12 text-text-muted" />
+          </div>
+        )}
+        {product.is_featured && (
+          <span className="absolute left-3 top-3 rounded bg-secondary px-2 py-0.5 text-xs font-bold text-white">
+            精選
+          </span>
+        )}
+      </div>
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-text-primary group-hover:text-primary transition-colors">
+          {product.name}【{product.denomination.toLocaleString()}點】
+        </h3>
+        {product.short_desc && (
+          <p className="mt-1 text-sm text-text-muted line-clamp-2">{product.short_desc}</p>
+        )}
+        <p className="mt-2 text-lg font-bold text-amber-400">
+          NT$ {product.denomination.toLocaleString()}
+        </p>
+        <div className="mt-3">
+          <span className="btn-primary inline-block text-sm">查看詳情</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export default function Home() {
   const { data: featured, isLoading } = useFeaturedProducts();
@@ -36,7 +78,7 @@ export default function Home() {
         ) : featured && featured.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {featured.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <FeaturedCard key={product.id} product={product} />
             ))}
           </div>
         ) : (

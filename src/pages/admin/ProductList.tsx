@@ -68,7 +68,7 @@ export default function AdminProductList() {
             <tr>
               <th className="px-4 py-3">商品</th>
               <th className="px-4 py-3">分類</th>
-              <th className="px-4 py-3">面額</th>
+              <th className="px-4 py-3">價格</th>
               <th className="px-4 py-3">狀態</th>
               <th className="px-4 py-3 text-right">操作</th>
             </tr>
@@ -79,20 +79,20 @@ export default function AdminProductList() {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-bg-surface">
-                      {product.images?.[0] ? (
-                        <img src={product.images[0]} alt="" className="h-full w-full object-cover" />
+                      {product.image_url ? (
+                        <img src={product.image_url} alt="" className="h-full w-full object-cover" />
                       ) : (
                         <div className="flex h-full items-center justify-center">
                           <ShoppingCart className="h-4 w-4 text-text-muted" />
                         </div>
                       )}
                     </div>
-                    <span className="font-medium text-text-primary">{product.name}</span>
+                    <span className="font-medium text-text-primary">{product.name}【{product.denomination.toLocaleString()}點】</span>
                   </div>
                 </td>
                 <td className="px-4 py-3 text-text-secondary">{product.category || '-'}</td>
-                <td className="px-4 py-3 text-text-secondary">
-                  {product.denominations?.join(', ') || '-'}
+                <td className="px-4 py-3 text-text-secondary text-amber-400 font-semibold">
+                  NT$ {product.denomination.toLocaleString()}
                 </td>
                 <td className="px-4 py-3">
                   <button

@@ -5,8 +5,8 @@ export interface Product {
   category: string | null;
   short_desc: string | null;
   description: string | null;
-  denominations: number[];
-  images: string[];
+  denomination: number;
+  image_url: string | null;
   buy_url: string | null;
   instructions: string | null;
   notice: string | null;

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, X, Upload, ChevronLeft, Loader2 } from 'lucide-react';
+import { Upload, ChevronLeft, Loader2, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useUpsertProduct } from '@/hooks/useProducts';
 import toast from 'react-hot-toast';
@@ -14,35 +14,36 @@ const productSchema = z.object({
   category: z.string().optional(),
   short_desc: z.string().optional(),
   description: z.string().optional(),
+  denomination: z.number().min(1, '面額需大於 0'),
   buy_url: z.string().optional(),
   instructions: z.string().optional(),
   notice: z.string().optional(),
   is_active: z.boolean(),
   is_featured: z.boolean(),
   sort_order: z.number(),
-  denominations_input: z.array(z.object({ value: z.number().min(1, '面額需大於 0') })),
 });
 
-type ProductFormData = z.infer<typeof productSchema>;
+type ProductFormValues = z.infer<typeof productSchema>;
 
-function generateSlug(name: string): string {
-  return name
+function generateSlug(name: string, denomination: number): string {
+  const base = name
     .toLowerCase()
     .trim()
     .replace(/[\s]+/g, '-')
     .replace(/[^a-z0-9\u4e00-\u9fff-]/g, '')
     .replace(/-+/g, '-');
+  return `${base}-${denomination}`;
 }
 
 export default function AdminProductForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const upsertProduct = useUpsertProduct();
-  const [images, setImages] = useState<string[]>([]);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const isEdit = !!id;
 
-  const { register, handleSubmit, control, watch, setValue, formState: { errors, isSubmitting } } = useForm<ProductFormData>({
+  const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: '',
@@ -50,28 +51,24 @@ export default function AdminProductForm() {
       category: '',
       short_desc: '',
       description: '',
+      denomination: 0,
       buy_url: '',
       instructions: '',
       notice: '',
       is_active: true,
       is_featured: false,
       sort_order: 0,
-      denominations_input: [],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'denominations_input',
-  });
-
-  // Auto-generate slug from name
+  // Auto-generate slug from name + denomination
   const nameValue = watch('name');
+  const denomValue = watch('denomination');
   useEffect(() => {
     if (!isEdit && nameValue) {
-      setValue('slug', generateSlug(nameValue));
+      setValue('slug', generateSlug(nameValue, denomValue || 0));
     }
-  }, [nameValue, isEdit, setValue]);
+  }, [nameValue, denomValue, isEdit, setValue]);
 
   // Load existing product for editing
   useEffect(() => {
@@ -92,19 +89,14 @@ export default function AdminProductForm() {
       setValue('category', data.category || '');
       setValue('short_desc', data.short_desc || '');
       setValue('description', data.description || '');
+      setValue('denomination', data.denomination || 0);
       setValue('buy_url', data.buy_url || '');
       setValue('instructions', data.instructions || '');
       setValue('notice', data.notice || '');
       setValue('is_active', data.is_active);
       setValue('is_featured', data.is_featured);
       setValue('sort_order', data.sort_order);
-      setImages(data.images || []);
-      if (data.denominations) {
-        setValue(
-          'denominations_input',
-          data.denominations.map((d: number) => ({ value: d }))
-        );
-      }
+      setImageUrl(data.image_url || null);
     };
     loadProduct();
   }, [id, setValue, navigate]);
@@ -130,7 +122,7 @@ export default function AdminProductForm() {
         .from('product-images')
         .getPublicUrl(fileName);
 
-      setImages((prev) => [...prev, urlData.publicUrl]);
+      setImageUrl(urlData.publicUrl);
       toast.success('圖片上傳成功');
     } catch {
       toast.error('圖片上傳失敗');
@@ -139,11 +131,7 @@ export default function AdminProductForm() {
     }
   };
 
-  const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const onSubmit = async (data: ProductFormData) => {
+  const onSubmit = async (data: ProductFormValues) => {
     try {
       const product = {
         ...(id ? { id } : {}),
@@ -152,14 +140,14 @@ export default function AdminProductForm() {
         category: data.category || null,
         short_desc: data.short_desc || null,
         description: data.description || null,
+        denomination: data.denomination,
+        image_url: imageUrl,
         buy_url: data.buy_url || null,
         instructions: data.instructions || null,
         notice: data.notice || null,
         is_active: data.is_active,
         is_featured: data.is_featured,
         sort_order: data.sort_order,
-        denominations: data.denominations_input.map((d) => d.value),
-        images,
       };
 
       await upsertProduct.mutateAsync(product);
@@ -184,30 +172,42 @@ export default function AdminProductForm() {
       </h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Name & Slug */}
+        {/* Name & Denomination */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-medium text-text-secondary">商品名稱 *</label>
-            <input {...register('name')} className="input-field" placeholder="例：Steam 錢包儲值卡" />
+            <input {...register('name')} className="input-field" placeholder="例：MyCard" />
             {errors.name && <p className="mt-1 text-xs text-danger">{errors.name.message}</p>}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-text-secondary">Slug *</label>
-            <input {...register('slug')} className="input-field" placeholder="steam-wallet-card" />
-            {errors.slug && <p className="mt-1 text-xs text-danger">{errors.slug.message}</p>}
+            <label className="mb-1 block text-sm font-medium text-text-secondary">面額 (點數) *</label>
+            <input
+              type="number"
+              {...register('denomination', { valueAsNumber: true })}
+              className="input-field"
+              placeholder="例：1000"
+            />
+            {errors.denomination && <p className="mt-1 text-xs text-danger">{errors.denomination.message}</p>}
           </div>
         </div>
 
-        {/* Category & Sort */}
+        {/* Slug & Category */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-sm font-medium text-text-secondary">分類</label>
-            <input {...register('category')} className="input-field" placeholder="例：Steam" />
+            <label className="mb-1 block text-sm font-medium text-text-secondary">Slug *</label>
+            <input {...register('slug')} className="input-field" placeholder="mycard-1000" />
+            {errors.slug && <p className="mt-1 text-xs text-danger">{errors.slug.message}</p>}
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-text-secondary">排序</label>
-            <input type="number" {...register('sort_order', { valueAsNumber: true })} className="input-field" />
+            <label className="mb-1 block text-sm font-medium text-text-secondary">分類</label>
+            <input {...register('category')} className="input-field" placeholder="例：MyCard" />
           </div>
+        </div>
+
+        {/* Sort order */}
+        <div className="w-32">
+          <label className="mb-1 block text-sm font-medium text-text-secondary">排序</label>
+          <input type="number" {...register('sort_order', { valueAsNumber: true })} className="input-field" />
         </div>
 
         {/* Short desc */}
@@ -219,7 +219,7 @@ export default function AdminProductForm() {
         {/* Description */}
         <div>
           <label className="mb-1 block text-sm font-medium text-text-secondary">商品描述</label>
-          <textarea {...register('description')} rows={5} className="input-field" placeholder="支援 Markdown 格式" />
+          <textarea {...register('description')} rows={4} className="input-field" placeholder="詳細商品描述" />
         </div>
 
         {/* Buy URL */}
@@ -228,62 +228,39 @@ export default function AdminProductForm() {
           <input {...register('buy_url')} className="input-field" placeholder="https://..." />
         </div>
 
-        {/* Denominations */}
-        <div>
-          <label className="mb-2 block text-sm font-medium text-text-secondary">面額</label>
-          <div className="space-y-2">
-            {fields.map((field, index) => (
-              <div key={field.id} className="flex items-center gap-2">
-                <input
-                  type="number"
-                  {...register(`denominations_input.${index}.value`, { valueAsNumber: true })}
-                  className="input-field w-32"
-                  placeholder="金額"
-                />
-                <button type="button" onClick={() => remove(index)} className="text-danger hover:text-red-400">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => append({ value: 0 })}
-            className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:text-primary-light"
-          >
-            <Plus className="h-4 w-4" /> 新增面額
-          </button>
-        </div>
-
-        {/* Images */}
+        {/* Image */}
         <div>
           <label className="mb-2 block text-sm font-medium text-text-secondary">商品圖片</label>
-          <div className="flex flex-wrap gap-3">
-            {images.map((url, i) => (
-              <div key={i} className="relative h-24 w-24 overflow-hidden rounded-lg border border-border-default">
-                <img src={url} alt="" className="h-full w-full object-cover" />
+          <div className="flex items-start gap-4">
+            {imageUrl ? (
+              <div className="relative h-32 w-32 overflow-hidden rounded-lg border border-border-default">
+                <img src={imageUrl} alt="" className="h-full w-full object-cover" />
                 <button
                   type="button"
-                  onClick={() => removeImage(i)}
+                  onClick={() => setImageUrl(null)}
                   className="absolute right-1 top-1 rounded bg-bg-dark/70 p-0.5 text-danger"
                 >
                   <X className="h-3 w-3" />
                 </button>
               </div>
-            ))}
-            <label className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-lg border border-dashed border-border-default hover:border-primary">
-              {uploading ? (
-                <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              ) : (
-                <Upload className="h-6 w-6 text-text-muted" />
-              )}
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </label>
+            ) : (
+              <label className="flex h-32 w-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-border-default hover:border-primary">
+                {uploading ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                ) : (
+                  <>
+                    <Upload className="h-6 w-6 text-text-muted" />
+                    <span className="mt-1 text-xs text-text-muted">上傳圖片</span>
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
         </div>
 
