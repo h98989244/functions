@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid gap-8 md:grid-cols-3">
           {/* Brand */}
           <div>
-            <span className="text-xl font-bold tracking-wider text-primary">CYBERCREDIT</span>
+            <span className="text-xl font-bold tracking-wider text-primary">名將數位</span>
             <p className="mt-3 text-sm text-text-muted">
               安全、快速的遊戲點數卡購買平台
             </p>

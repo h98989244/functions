@@ -27,7 +27,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold tracking-wider text-primary">
-          CYBERCREDIT
+          名將數位
         </Link>
 
         {/* Desktop Nav */}
