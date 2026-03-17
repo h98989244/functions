@@ -26,3 +26,8 @@ export interface SiteSettings {
 }
 
 export type ProductFormData = Omit<Product, 'id' | 'created_at' | 'updated_at'>;
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}

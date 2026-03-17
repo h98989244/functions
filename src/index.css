@@ -49,6 +49,11 @@
   50% { box-shadow: 0 0 10px var(--color-primary), 0 0 20px rgba(0, 229, 255, 0.5); }
 }
 
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;

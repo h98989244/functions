@@ -14,6 +14,8 @@ import Terms from '@/pages/Terms';
 import AdminLogin from '@/pages/admin/Login';
 import AdminProductList from '@/pages/admin/ProductList';
 import AdminProductForm from '@/pages/admin/ProductForm';
+import Checkout from '@/pages/Checkout';
+import CartDrawer from '@/components/CartDrawer';
 import AdminContactSettings from '@/pages/admin/ContactSettings';
 
 export default function App() {
@@ -22,12 +24,14 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
+      <CartDrawer />
       <main className="flex-1">
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:slug" element={<ProductDetail />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />

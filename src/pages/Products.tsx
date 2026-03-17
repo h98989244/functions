@@ -1,11 +1,20 @@
 import { useMemo } from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Check } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
+import { useCartStore } from '@/stores/cartStore';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import toast from 'react-hot-toast';
 import type { Product } from '@/types';
 
 function DenominationCard({ product }: { product: Product }) {
-  const buyUrl = product.buy_url || '#';
+  const { items, addItem, updateQuantity } = useCartStore();
+  const cartItem = items.find((item) => item.product.id === product.id);
+  const quantity = cartItem?.quantity || 0;
+
+  const handleAddToCart = () => {
+    addItem(product);
+    toast.success(`已加入購物車：${product.name}【${product.denomination.toLocaleString()}點】`);
+  };
 
   return (
     <div className="card group flex flex-col items-center overflow-hidden p-4 text-center transition-all hover:border-primary/50 hover:shadow-[0_0_20px_rgba(0,229,255,0.1)]">
@@ -29,6 +38,12 @@ function DenominationCard({ product }: { product: Product }) {
         <div className="absolute bottom-1 right-1 rounded bg-black/70 px-1.5 py-0.5 text-xs font-bold text-primary">
           TWD {product.denomination.toLocaleString()}
         </div>
+        {/* In-cart indicator */}
+        {quantity > 0 && (
+          <div className="absolute left-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary">
+            <Check className="h-3 w-3 text-bg-dark" />
+          </div>
+        )}
       </div>
 
       {/* Name */}
@@ -41,20 +56,34 @@ function DenominationCard({ product }: { product: Product }) {
         NT$ {product.denomination.toLocaleString()}
       </p>
 
-      {/* Buy button */}
-      {product.buy_url ? (
-        <a
-          href={buyUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary mt-3 w-full py-2 text-center text-sm"
-        >
-          立即購買
-        </a>
+      {/* Cart controls */}
+      {quantity > 0 ? (
+        <div className="mt-3 flex w-full items-center justify-center gap-2">
+          <button
+            onClick={() => updateQuantity(product.id, quantity - 1)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border-default bg-bg-surface text-text-secondary hover:border-primary hover:text-primary transition-colors"
+          >
+            <Minus className="h-3 w-3" />
+          </button>
+          <span className="w-8 text-center text-sm font-bold text-text-primary">{quantity}</span>
+          <button
+            onClick={() => {
+              updateQuantity(product.id, quantity + 1);
+              toast.success('數量已更新');
+            }}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border-default bg-bg-surface text-text-secondary hover:border-primary hover:text-primary transition-colors"
+          >
+            <Plus className="h-3 w-3" />
+          </button>
+        </div>
       ) : (
-        <span className="mt-3 inline-block w-full rounded-lg bg-text-muted/20 py-2 text-center text-sm text-text-muted cursor-not-allowed">
-          準備中
-        </span>
+        <button
+          onClick={handleAddToCart}
+          className="btn-primary mt-3 flex w-full items-center justify-center gap-1.5 py-2 text-sm"
+        >
+          <ShoppingCart className="h-3.5 w-3.5" />
+          加入購物車
+        </button>
       )}
     </div>
   );

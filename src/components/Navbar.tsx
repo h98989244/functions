@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, LogOut, Settings, ShoppingBag, ChevronDown } from 'lucide-react';
+import { Menu, X, LogOut, Settings, ShoppingBag, ShoppingCart, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { useCartStore } from '@/stores/cartStore';
 import { supabase } from '@/lib/supabase';
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const { user } = useAuthStore();
+  const { openDrawer, getItemCount } = useCartStore();
   const location = useLocation();
+  const itemCount = getItemCount();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -50,6 +53,19 @@ export default function Navbar() {
 
         {/* Desktop Right */}
         <div className="hidden items-center gap-4 md:flex">
+          {/* Cart button */}
+          <button
+            onClick={openDrawer}
+            className="relative rounded-lg p-2 text-text-secondary transition-colors hover:bg-bg-card hover:text-primary"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {itemCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-danger text-[10px] font-bold text-white">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
+          </button>
+
           {user ? (
             <div className="relative">
               <button
@@ -98,13 +114,26 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="text-text-secondary md:hidden"
-        >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        {/* Mobile right */}
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            onClick={openDrawer}
+            className="relative rounded-lg p-2 text-text-secondary"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {itemCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-danger text-[10px] font-bold text-white">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="text-text-secondary"
+          >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
