@@ -7,6 +7,10 @@ import Home from '@/pages/Home';
 import Products from '@/pages/Products';
 import ProductDetail from '@/pages/ProductDetail';
 import Contact from '@/pages/Contact';
+import About from '@/pages/About';
+import FAQ from '@/pages/FAQ';
+import Privacy from '@/pages/Privacy';
+import Terms from '@/pages/Terms';
 import AdminLogin from '@/pages/admin/Login';
 import AdminProductList from '@/pages/admin/ProductList';
 import AdminProductForm from '@/pages/admin/ProductForm';
@@ -25,6 +29,10 @@ export default function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/products/:slug" element={<ProductDetail />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
 
           {/* Admin routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
