@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,9 +10,9 @@ import { supabase } from '@/lib/supabase';
 const checkoutSchema = z.object({
   email: z.string().email('請輸入有效的 Email'),
   phone: z.string().optional(),
-  payment_method: z.enum(['atm', 'cvs'], { required_error: '請選擇付款方式' }),
-  agree_terms: z.literal(true, { errorMap: () => ({ message: '請同意購買條款與隱私權政策' }) }),
-  agree_no_refund: z.literal(true, { errorMap: () => ({ message: '請確認了解不可退換' }) }),
+  payment_method: z.enum(['atm', 'cvs'], { message: '請選擇付款方式' }),
+  agree_terms: z.literal(true, { message: '請同意購買條款與隱私權政策' }),
+  agree_no_refund: z.literal(true, { message: '請確認了解不可退換' }),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -28,7 +28,6 @@ function generateOrderNumber() {
 
 export default function Checkout() {
   const { items, getTotal, getItemCount, clearCart } = useCartStore();
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<{ orderNumber: string; email: string } | null>(null);
 
