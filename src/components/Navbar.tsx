@@ -26,8 +26,9 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-border-default bg-bg-dark/95 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-bold tracking-wider text-primary">
-          名將數位
+        <Link to="/" className="flex items-center gap-2">
+          <img src="/logo.png" alt="名將數位" className="h-10 w-10" />
+          <span className="text-2xl font-bold tracking-wider text-primary">名將數位</span>
         </Link>
 
         {/* Desktop Nav */}

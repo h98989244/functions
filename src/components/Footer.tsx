@@ -10,7 +10,10 @@ export default function Footer() {
         <div className="grid gap-8 md:grid-cols-4">
           {/* Brand */}
           <div>
-            <span className="text-xl font-bold tracking-wider text-primary">名將數位</span>
+            <div className="flex items-center gap-2">
+              <img src="/logo.png" alt="名將數位" className="h-8 w-8" />
+              <span className="text-xl font-bold tracking-wider text-primary">名將數位</span>
+            </div>
             <p className="mt-3 text-sm text-text-muted">
               安全、快速的遊戲點數卡購買平台
             </p>
