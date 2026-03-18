@@ -47,7 +47,7 @@ export default function Cart() {
               {/* Info */}
               <div className="flex-1">
                 <h3 className="font-semibold text-text-primary">
-                  {item.product.name}【{item.product.denomination.toLocaleString()}點】
+                  {item.product.name}【{item.product.price.toLocaleString()}點】
                 </h3>
                 {item.product.short_desc && (
                   <p className="mt-0.5 text-xs text-text-muted">{item.product.short_desc}</p>
@@ -56,7 +56,7 @@ export default function Cart() {
 
               {/* Price */}
               <span className="text-lg font-bold text-primary">
-                NT$ {item.product.denomination.toLocaleString()}
+                NT$ {item.product.price.toLocaleString()}
               </span>
 
               {/* Quantity controls */}

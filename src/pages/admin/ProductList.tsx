@@ -87,12 +87,12 @@ export default function AdminProductList() {
                         </div>
                       )}
                     </div>
-                    <span className="font-medium text-text-primary">{product.name}【{product.denomination.toLocaleString()}點】</span>
+                    <span className="font-medium text-text-primary">{product.name}【{product.price.toLocaleString()}點】</span>
                   </div>
                 </td>
                 <td className="px-4 py-3 text-text-secondary">{product.category || '-'}</td>
                 <td className="px-4 py-3 text-text-secondary text-amber-400 font-semibold">
-                  NT$ {product.denomination.toLocaleString()}
+                  NT$ {product.price.toLocaleString()}
                 </td>
                 <td className="px-4 py-3">
                   <button

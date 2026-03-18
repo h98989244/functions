@@ -13,7 +13,7 @@ function DenominationCard({ product }: { product: Product }) {
 
   const handleAddToCart = () => {
     addItem(product);
-    toast.success(`已加入購物車：${product.name}【${product.denomination.toLocaleString()}點】`);
+    toast.success(`已加入購物車：${product.name}【${product.price.toLocaleString()}點】`);
   };
 
   return (
@@ -23,20 +23,20 @@ function DenominationCard({ product }: { product: Product }) {
         {product.image_url ? (
           <img
             src={product.image_url}
-            alt={`${product.name}【${product.denomination.toLocaleString()}點】`}
+            alt={`${product.name}【${product.price.toLocaleString()}點】`}
             className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center">
             <ShoppingCart className="mb-1 h-8 w-8 text-primary" />
             <span className="text-lg font-bold text-primary">
-              {product.denomination.toLocaleString()}
+              {product.price.toLocaleString()}
             </span>
           </div>
         )}
         {/* Denomination badge */}
         <div className="absolute bottom-1 right-1 rounded bg-black/70 px-1.5 py-0.5 text-xs font-bold text-primary">
-          TWD {product.denomination.toLocaleString()}
+          TWD {product.price.toLocaleString()}
         </div>
         {/* In-cart indicator */}
         {quantity > 0 && (
@@ -48,12 +48,12 @@ function DenominationCard({ product }: { product: Product }) {
 
       {/* Name */}
       <h3 className="text-sm font-semibold text-text-primary">
-        {product.name}【{product.denomination.toLocaleString()}點】
+        {product.name}【{product.price.toLocaleString()}點】
       </h3>
 
       {/* Price */}
       <p className="mt-2 text-lg font-bold text-amber-400">
-        NT$ {product.denomination.toLocaleString()}
+        NT$ {product.price.toLocaleString()}
       </p>
 
       {/* Cart controls */}

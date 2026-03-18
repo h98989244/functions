@@ -32,14 +32,14 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Content */}
       <div className="p-4">
         <h3 className="text-lg font-semibold text-text-primary group-hover:text-primary transition-colors">
-          {product.name}【{product.denomination.toLocaleString()}點】
+          {product.name}【{product.price.toLocaleString()}點】
         </h3>
         {product.short_desc && (
           <p className="mt-1 text-sm text-text-muted line-clamp-2">{product.short_desc}</p>
         )}
 
         <p className="mt-2 text-lg font-bold text-amber-400">
-          NT$ {product.denomination.toLocaleString()}
+          NT$ {product.price.toLocaleString()}
         </p>
 
         <div className="mt-4">

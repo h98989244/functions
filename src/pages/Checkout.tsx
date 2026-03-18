@@ -82,9 +82,9 @@ export default function Checkout() {
         order_id: order.id,
         product_id: item.product.id,
         product_name: item.product.name,
-        denomination: item.product.denomination,
+        price: item.product.price,
         quantity: item.quantity,
-        subtotal: item.product.denomination * item.quantity,
+        subtotal: item.product.price * item.quantity,
       }));
 
       const { error: itemsError } = await supabase
@@ -343,10 +343,10 @@ export default function Checkout() {
                 {items.map((item) => (
                   <div key={item.product.id} className="flex justify-between text-sm">
                     <span className="text-text-secondary">
-                      {item.product.name}【{item.product.denomination.toLocaleString()}點】x{item.quantity}
+                      {item.product.name}【{item.product.price.toLocaleString()}點】x{item.quantity}
                     </span>
                     <span className="font-medium text-text-primary">
-                      NT$ {(item.product.denomination * item.quantity).toLocaleString()}
+                      NT$ {(item.product.price * item.quantity).toLocaleString()}
                     </span>
                   </div>
                 ))}

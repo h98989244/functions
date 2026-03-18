@@ -14,7 +14,7 @@ const productSchema = z.object({
   category: z.string().optional(),
   short_desc: z.string().optional(),
   description: z.string().optional(),
-  denomination: z.number().min(1, '面額需大於 0'),
+  price: z.number().min(1, '面額需大於 0'),
   buy_url: z.string().optional(),
   instructions: z.string().optional(),
   notice: z.string().optional(),
@@ -25,14 +25,14 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
-function generateSlug(name: string, denomination: number): string {
+function generateSlug(name: string, price: number): string {
   const base = name
     .toLowerCase()
     .trim()
     .replace(/[\s]+/g, '-')
     .replace(/[^a-z0-9\u4e00-\u9fff-]/g, '')
     .replace(/-+/g, '-');
-  return `${base}-${denomination}`;
+  return `${base}-${price}`;
 }
 
 export default function AdminProductForm() {
@@ -51,7 +51,7 @@ export default function AdminProductForm() {
       category: '',
       short_desc: '',
       description: '',
-      denomination: 0,
+      price: 0,
       buy_url: '',
       instructions: '',
       notice: '',
@@ -61,9 +61,9 @@ export default function AdminProductForm() {
     },
   });
 
-  // Auto-generate slug from name + denomination
+  // Auto-generate slug from name + price
   const nameValue = watch('name');
-  const denomValue = watch('denomination');
+  const denomValue = watch('price');
   useEffect(() => {
     if (!isEdit && nameValue) {
       setValue('slug', generateSlug(nameValue, denomValue || 0));
@@ -89,7 +89,7 @@ export default function AdminProductForm() {
       setValue('category', data.category || '');
       setValue('short_desc', data.short_desc || '');
       setValue('description', data.description || '');
-      setValue('denomination', data.denomination || 0);
+      setValue('price', data.price || 0);
       setValue('buy_url', data.buy_url || '');
       setValue('instructions', data.instructions || '');
       setValue('notice', data.notice || '');
@@ -140,7 +140,7 @@ export default function AdminProductForm() {
         category: data.category || null,
         short_desc: data.short_desc || null,
         description: data.description || null,
-        denomination: data.denomination,
+        price: data.price,
         image_url: imageUrl,
         buy_url: data.buy_url || null,
         instructions: data.instructions || null,
@@ -183,11 +183,11 @@ export default function AdminProductForm() {
             <label className="mb-1 block text-sm font-medium text-text-secondary">面額 (點數) *</label>
             <input
               type="number"
-              {...register('denomination', { valueAsNumber: true })}
+              {...register('price', { valueAsNumber: true })}
               className="input-field"
               placeholder="例：1000"
             />
-            {errors.denomination && <p className="mt-1 text-xs text-danger">{errors.denomination.message}</p>}
+            {errors.price && <p className="mt-1 text-xs text-danger">{errors.price.message}</p>}
           </div>
         </div>
 

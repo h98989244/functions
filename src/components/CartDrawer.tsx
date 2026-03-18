@@ -94,10 +94,10 @@ export default function CartDrawer() {
                   <div className="flex flex-1 flex-col justify-between">
                     <div>
                       <h3 className="text-sm font-semibold text-text-primary">
-                        {item.product.name}【{item.product.denomination.toLocaleString()}點】
+                        {item.product.name}【{item.product.price.toLocaleString()}點】
                       </h3>
                       <p className="mt-0.5 text-sm font-bold text-amber-400">
-                        NT$ {item.product.denomination.toLocaleString()}
+                        NT$ {item.product.price.toLocaleString()}
                       </p>
                     </div>
 
@@ -127,7 +127,7 @@ export default function CartDrawer() {
 
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-semibold text-text-primary">
-                          NT$ {(item.product.denomination * item.quantity).toLocaleString()}
+                          NT$ {(item.product.price * item.quantity).toLocaleString()}
                         </span>
                         <button
                           onClick={() => removeItem(item.product.id)}

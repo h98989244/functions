@@ -5,7 +5,7 @@ export interface Product {
   category: string | null;
   short_desc: string | null;
   description: string | null;
-  denomination: number;
+  price: number;
   image_url: string | null;
   buy_url: string | null;
   instructions: string | null;
@@ -52,7 +52,7 @@ export interface OrderItem {
   order_id: string;
   product_id: string | null;
   product_name: string;
-  denomination: number;
+  price: number;
   quantity: number;
   subtotal: number;
   created_at: string;

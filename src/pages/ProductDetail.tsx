@@ -48,14 +48,14 @@ export default function ProductDetail() {
             </span>
           )}
           <h1 className="text-3xl font-bold text-text-primary">
-            {product.name}【{product.denomination.toLocaleString()}點】
+            {product.name}【{product.price.toLocaleString()}點】
           </h1>
           {product.short_desc && (
             <p className="mt-2 text-text-secondary">{product.short_desc}</p>
           )}
 
           <p className="mt-4 text-3xl font-bold text-amber-400">
-            NT$ {product.denomination.toLocaleString()}
+            NT$ {product.price.toLocaleString()}
           </p>
 
           {product.description && (
